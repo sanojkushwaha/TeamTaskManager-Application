@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Projects - TaskFlow</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#f5f6fa; }
+        .navbar {
+            background:white; padding:0 30px; height:60px; display:flex;
+            align-items:center; justify-content:space-between;
+            box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        }
+        .navbar-brand { font-weight:700; font-size:20px; color:#667eea; }
+        .nav-links a { margin-left:20px; text-decoration:none; color:#555; font-weight:500; }
+        .nav-links a:hover, .nav-links a.active { color:#667eea; }
+        .nav-user { display:flex; align-items:center; gap:12px; }
+        .nav-user span { font-weight:600; color:#333; }
+        .logout-btn { padding:7px 16px; background:#667eea; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px; }
+        .content { padding:30px; max-width:1200px; margin:0 auto; }
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+        h2 { color:#333; font-size:22px; }
+        .btn { padding:10px 20px; background:#667eea; color:white; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; }
+        .btn:hover { background:#5568d4; }
+        .btn-danger { background:#e74c3c; }
+        .btn-danger:hover { background:#c0392b; }
+        .btn-sm { padding:6px 12px; font-size:12px; }
+        .btn-outline { background:white; color:#667eea; border:1.5px solid #667eea; }
+        .btn-outline:hover { background:#667eea; color:white; }
+        .projects-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:20px; }
+        .project-card {
+            background:white; border-radius:12px; padding:22px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.06);
+        }
+        .project-card h3 { color:#333; font-size:17px; margin-bottom:8px; }
+        .project-card p { color:#777; font-size:13px; margin-bottom:14px; min-height:36px; }
+        .project-meta { display:flex; gap:14px; margin-bottom:16px; }
+        .meta-item { font-size:12px; color:#888; }
+        .meta-item span { font-weight:700; color:#555; }
+        .project-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .members-section { margin-top:14px; padding-top:14px; border-top:1px solid #f0f0f0; }
+        .members-title { font-size:12px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:8px; }
+        .member-chip {
+            display:inline-block; background:#f0f0f0; color:#555;
+            padding:3px 10px; border-radius:20px; font-size:12px; margin:2px;
+        }
+        /* Modal */
+        .modal-overlay {
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+            z-index:1000; align-items:center; justify-content:center;
+        }
+        .modal-overlay.open { display:flex; }
+        .modal { background:white; border-radius:12px; padding:30px; width:460px; max-width:90vw; }
+        .modal h3 { margin-bottom:20px; color:#333; }
+        .form-group { margin-bottom:16px; }
+        label { display:block; margin-bottom:6px; font-weight:600; color:#333; font-size:13px; }
+        input, select, textarea {
+            width:100%; padding:10px 12px; border:1.5px solid #ddd;
+            border-radius:8px; font-size:14px; outline:none;
+        }
+        input:focus, select:focus, textarea:focus { border-color:#667eea; }
+        .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+        .btn-cancel { background:#f0f0f0; color:#555; }
+        .btn-cancel:hover { background:#ddd; }
+        .empty { text-align:center; padding:60px; color:#888; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <span class="navbar-brand">🚀 TaskFlow</span>
+    <div class="nav-links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/projects.html" class="active">Projects</a>
+        <a href="/tasks.html">My Tasks</a>
+    </div>
+    <div class="nav-user">
+        <span id="userName">Loading...</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-header">
+        <h2>📁 Projects</h2>
+        <button class="btn" id="createProjectBtn" onclick="openCreateModal()" style="display:none">+ New Project</button>
+    </div>
+    <div class="projects-grid" id="projectsGrid">
+        <div class="empty">Loading projects...</div>
+    </div>
+</div>
+
+<!-- Create/Edit Project Modal -->
+<div class="modal-overlay" id="projectModal">
+    <div class="modal">
+        <h3 id="modalTitle">Create Project</h3>
+        <div class="form-group">
+            <label>Project Name *</label>
+            <input type="text" id="projectName" placeholder="Enter project name"/>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="projectDesc" rows="3" placeholder="Project description..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn" onclick="saveProject()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="memberModal">
+    <div class="modal">
+        <h3>Add Member to Project</h3>
+        <div class="form-group">
+            <label>Select User</label>
+            <select id="memberSelect"></select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeMemberModal()">Cancel</button>
+            <button class="btn" onclick="addMember()">Add Member</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!token) window.location.href = '/index.html';
+
+    document.getElementById('userName').textContent = `👤 ${user.name} (${user.role})`;
+
+    let editingProjectId = null;
+    let memberProjectId = null;
+    let allUsers = [];
+
+    if (user.role === 'ADMIN') {
+        document.getElementById('createProjectBtn').style.display = 'inline-block';
+    }
+
+    async function apiFetch(url, options = {}) {
+        const res = await fetch(url, {
+            ...options,
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(options.headers || {}) }
+        });
+        if (res.status === 401) { logout(); return null; }
+        return res.json();
+    }
+
+    async function loadProjects() {
+        const projects = await apiFetch('/api/projects');
+        const grid = document.getElementById('projectsGrid');
+
+        if (!projects || projects.length === 0) {
+            grid.innerHTML = '<div class="empty">No projects found. Create one to get started!</div>';
+            return;
+        }
+
+        grid.innerHTML = projects.map(p => `
+            <div class="project-card">
+                <h3>${p.name}</h3>
+                <p>${p.description || 'No description'}</p>
+                <div class="project-meta">
+                    <div class="meta-item">👥 Members: <span>${p.memberCount}</span></div>
+                    <div class="meta-item">✅ Tasks: <span>${p.taskCount}</span></div>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-outline btn-sm" onclick="viewTasks(${p.id})">View Tasks</button>
+                    ${user.role === 'ADMIN' ? `
+                        <button class="btn btn-sm" onclick="openEditModal(${p.id},'${p.name.replace(/'/g,"\\'")}','${(p.description||'').replace(/'/g,"\\'")}')">Edit</button>
+                        <button class="btn btn-sm" onclick="openMemberModal(${p.id})">+ Member</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">Delete</button>
+                    ` : ''}
+                </div>
+                <div class="members-section">
+                    <div class="members-title">Team Members</div>
+                    ${p.members.length > 0
+                        ? p.members.map(m => `<span class="member-chip">${m.name}</span>`).join('')
+                        : '<span style="color:#aaa;font-size:12px">No members yet</span>'}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function loadUsers() {
+        allUsers = await apiFetch('/api/projects/users/all') || [];
+    }
+
+    function viewTasks(projectId) {
+        window.location.href = `/tasks.html?projectId=${projectId}`;
+    }
+
+    function openCreateModal() {
+        editingProjectId = null;
+        document.getElementById('modalTitle').textContent = 'Create Project';
+        document.getElementById('projectName').value = '';
+        document.getElementById('projectDesc').value = '';
+        document.getElementById('projectModal').classList.add('open');
+    }
+
+    function openEditModal(id, name, desc) {
+        editingProjectId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Project';
+        document.getElementById('projectName').value = name;
+        document.getElementById('projectDesc').value = desc;
+        document.getElementById('projectModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('projectModal').classList.remove('open');
+    }
+
+    async function saveProject() {
+        const name = document.getElementById('projectName').value.trim();
+        const description = document.getElementById('projectDesc').value.trim();
+        if (!name) return alert('Project name is required');
+
+        const url = editingProjectId ? `/api/projects/${editingProjectId}` : '/api/projects';
+        const method = editingProjectId ? 'PUT' : 'POST';
+
+        await apiFetch(url, { method, body: JSON.stringify({ name, description }) });
+        closeModal();
+        loadProjects();
+    }
+
+    async function deleteProject(id) {
+        if (!confirm('Delete this project and all its tasks?')) return;
+        await apiFetch(`/api/projects/${id}`, { method: 'DELETE' });
+        loadProjects();
+    }
+
+    async function openMemberModal(projectId) {
+        memberProjectId = projectId;
+        await loadUsers();
+        const select = document.getElementById('memberSelect');
+        select.innerHTML = allUsers
+            .filter(u => u.id !== user.id)
+            .map(u => `<option value="${u.id}">${u.name} (${u.email}) - ${u.role}</option>`)
+            .join('');
+        document.getElementById('memberModal').classList.add('open');
+    }
+
+    function closeMemberModal() {
+        document.getElementById('memberModal').classList.remove('open');
+    }
+
+    async function addMember() {
+        const userId = document.getElementById('memberSelect').value;
+        const result = await apiFetch(`/api/projects/${memberProjectId}/members/${userId}`, { method: 'POST' });
+        if (result) {
+            alert(result.message || 'Member added!');
+            closeMemberModal();
+            loadProjects();
+        }
+    }
+
+    function logout() { localStorage.clear(); window.location.href = '/index.html'; }
+
+    loadProjects();
+</script>
+</body>
+</html>

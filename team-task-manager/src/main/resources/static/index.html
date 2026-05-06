@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Team Task Manager - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .auth-container {
+            background: white; border-radius: 16px;
+            padding: 40px; width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #667eea; font-size: 24px; font-weight: 700; }
+        .logo p { color: #666; font-size: 14px; margin-top: 4px; }
+        .tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #f0f0f0; }
+        .tab {
+            flex: 1; padding: 12px; text-align: center; cursor: pointer;
+            font-weight: 600; color: #999; transition: all 0.3s;
+        }
+        .tab.active { color: #667eea; border-bottom: 2px solid #667eea; margin-bottom: -2px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; font-size: 14px; }
+        input, select {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #ddd;
+            border-radius: 8px; font-size: 14px; outline: none; transition: border 0.3s;
+        }
+        input:focus, select:focus { border-color: #667eea; }
+        .btn {
+            width: 100%; padding: 13px; background: #667eea; color: white;
+            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .btn:hover { background: #5568d4; }
+        .error { color: #e74c3c; font-size: 13px; margin-top: 10px; text-align: center; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="logo">
+        <h1>🚀 TaskFlow</h1>
+        <p>Team Task Manager</p>
+    </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">Login</div>
+        <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Your password"/>
+        </div>
+        <button class="btn" onclick="login()">Login</button>
+        <p class="error hidden" id="loginError"></p>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" class="hidden">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="signupName" placeholder="Your full name"/>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="signupPassword" placeholder="Min 6 characters"/>
+        </div>
+        <div class="form-group">
+            <label>Role</label>
+            <select id="signupRole">
+                <option value="MEMBER">Member</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+        </div>
+        <button class="btn" onclick="signup()">Create Account</button>
+        <p class="error hidden" id="signupError"></p>
+    </div>
+</div>
+
+<script>
+    const API = '';
+
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) {
+        window.location.href = '/dashboard.html';
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('signupForm').classList.add('hidden');
+
+        if (tab === 'login') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('loginForm').classList.remove('hidden');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('signupForm').classList.remove('hidden');
+        }
+    }
+
+    async function login() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errEl = document.getElementById('loginError');
+        errEl.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Login failed');
+            saveAuth(data);
+            window.location.href = '/dashboard.html';
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    async function signup() {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const role = document.getElementById('signupRole').value;
+        const errEl = document.getElementById('signupError');
+        errEl.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API}/api/auth/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, role })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Signup failed');
+            saveAuth(data);
+            window.location.href = '/dashboard.html';
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    function saveAuth(data) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({
+            id: data.userId, name: data.name, email: data.email, role: data.role
+        }));
+    }
+</script>
+</body>
+</html>

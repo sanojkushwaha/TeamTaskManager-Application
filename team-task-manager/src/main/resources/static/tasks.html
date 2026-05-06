@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tasks - TaskFlow</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:#f5f6fa; }
+        .navbar {
+            background:white; padding:0 30px; height:60px; display:flex;
+            align-items:center; justify-content:space-between;
+            box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        }
+        .navbar-brand { font-weight:700; font-size:20px; color:#667eea; }
+        .nav-links a { margin-left:20px; text-decoration:none; color:#555; font-weight:500; }
+        .nav-links a:hover, .nav-links a.active { color:#667eea; }
+        .nav-user { display:flex; align-items:center; gap:12px; }
+        .nav-user span { font-weight:600; color:#333; }
+        .logout-btn { padding:7px 16px; background:#667eea; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px; }
+        .content { padding:30px; max-width:1200px; margin:0 auto; }
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        h2 { color:#333; font-size:22px; }
+        .btn { padding:10px 20px; background:#667eea; color:white; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; }
+        .btn:hover { background:#5568d4; }
+        .btn-danger { background:#e74c3c; }
+        .btn-danger:hover { background:#c0392b; }
+        .btn-sm { padding:5px 11px; font-size:12px; }
+        .filters { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .filter-select {
+            padding:8px 14px; border:1.5px solid #ddd; border-radius:8px;
+            font-size:13px; outline:none; background:white; cursor:pointer;
+        }
+        .filter-select:focus { border-color:#667eea; }
+        .tasks-table-wrap { background:white; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); overflow:hidden; }
+        table { width:100%; border-collapse:collapse; }
+        th { text-align:left; padding:12px 16px; font-size:12px; text-transform:uppercase; color:#888; background:#fafafa; border-bottom:1px solid #f0f0f0; }
+        td { padding:14px 16px; border-bottom:1px solid #f8f8f8; font-size:14px; color:#444; }
+        tr:last-child td { border:none; }
+        tr:hover td { background:#fafeff; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; text-transform:uppercase; }
+        .badge-TODO { background:#f0f0f0; color:#666; }
+        .badge-IN_PROGRESS { background:#fff3cd; color:#856404; }
+        .badge-DONE { background:#d4edda; color:#155724; }
+        .badge-HIGH { background:#f8d7da; color:#721c24; }
+        .badge-MEDIUM { background:#fff3cd; color:#856404; }
+        .badge-LOW { background:#d4edda; color:#155724; }
+        .overdue-row td { background:#fff8f8; }
+        .overdue-label { color:#e74c3c; font-size:11px; font-weight:600; }
+        .actions { display:flex; gap:6px; }
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+        .modal-overlay.open { display:flex; }
+        .modal { background:white; border-radius:12px; padding:30px; width:500px; max-width:92vw; max-height:90vh; overflow-y:auto; }
+        .modal h3 { margin-bottom:20px; color:#333; }
+        .form-group { margin-bottom:14px; }
+        label { display:block; margin-bottom:5px; font-weight:600; color:#333; font-size:13px; }
+        input, select, textarea { width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; outline:none; }
+        input:focus, select:focus, textarea:focus { border-color:#667eea; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+        .btn-cancel { background:#f0f0f0; color:#555; }
+        .btn-cancel:hover { background:#ddd; }
+        .status-select { padding:4px 10px; border:1.5px solid #ddd; border-radius:6px; font-size:12px; cursor:pointer; }
+        .empty { text-align:center; padding:60px; color:#888; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <span class="navbar-brand">🚀 TaskFlow</span>
+    <div class="nav-links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/tasks.html" class="active">My Tasks</a>
+    </div>
+    <div class="nav-user">
+        <span id="userName">Loading...</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-header">
+        <h2 id="pageTitle">📋 Tasks</h2>
+        <button class="btn" onclick="openCreateModal()">+ New Task</button>
+    </div>
+
+    <div class="filters">
+        <select class="filter-select" id="filterProject" onchange="applyFilters()">
+            <option value="">All Projects</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="TODO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="DONE">Done</option>
+        </select>
+        <select class="filter-select" id="filterPriority" onchange="applyFilters()">
+            <option value="">All Priorities</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+        </select>
+    </div>
+
+    <div class="tasks-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th><th>Project</th><th>Status</th>
+                    <th>Priority</th><th>Assigned To</th><th>Due Date</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tasksBody">
+                <tr><td colspan="7" class="empty">Loading tasks...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create/Edit Task Modal -->
+<div class="modal-overlay" id="taskModal">
+    <div class="modal">
+        <h3 id="taskModalTitle">Create Task</h3>
+        <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="taskTitle" placeholder="Task title"/>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="taskDesc" rows="2" placeholder="Task description..."></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Project *</label>
+                <select id="taskProject" onchange="loadProjectMembers()"></select>
+            </div>
+            <div class="form-group">
+                <label>Assign To</label>
+                <select id="taskAssignee"><option value="">Unassigned</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Status</label>
+                <select id="taskStatus">
+                    <option value="TODO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="DONE">Done</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="taskPriority">
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM" selected>Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="taskDueDate"/>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeTaskModal()">Cancel</button>
+            <button class="btn" onclick="saveTask()">Save Task</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!token) window.location.href = '/index.html';
+
+    document.getElementById('userName').textContent = `👤 ${user.name} (${user.role})`;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectIdFilter = urlParams.get('projectId');
+
+    let allTasks = [];
+    let allProjects = [];
+    let editingTaskId = null;
+
+    async function apiFetch(url, options = {}) {
+        const res = await fetch(url, {
+            ...options,
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(options.headers||{}) }
+        });
+        if (res.status === 401) { logout(); return null; }
+        return res.json();
+    }
+
+    async function loadAll() {
+        allProjects = await apiFetch('/api/projects') || [];
+
+        // Populate project filter
+        const filterSel = document.getElementById('filterProject');
+        filterSel.innerHTML = '<option value="">All Projects</option>' +
+            allProjects.map(p => `<option value="${p.id}" ${projectIdFilter == p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+
+        // Load tasks
+        if (user.role === 'ADMIN') {
+            allTasks = await apiFetch('/api/tasks/all') || [];
+        } else {
+            allTasks = await apiFetch('/api/tasks/my') || [];
+        }
+
+        if (projectIdFilter) {
+            const p = allProjects.find(p => p.id == projectIdFilter);
+            if (p) document.getElementById('pageTitle').textContent = `📋 Tasks - ${p.name}`;
+        }
+
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const projectId = document.getElementById('filterProject').value;
+        const status = document.getElementById('filterStatus').value;
+        const priority = document.getElementById('filterPriority').value;
+
+        let filtered = allTasks;
+        if (projectId) filtered = filtered.filter(t => t.projectId == projectId);
+        if (status) filtered = filtered.filter(t => t.status === status);
+        if (priority) filtered = filtered.filter(t => t.priority === priority);
+
+        renderTasks(filtered);
+    }
+
+    function renderTasks(tasks) {
+        const body = document.getElementById('tasksBody');
+        if (tasks.length === 0) {
+            body.innerHTML = '<tr><td colspan="7" class="empty">No tasks found</td></tr>';
+            return;
+        }
+
+        body.innerHTML = tasks.map(t => `
+            <tr class="${t.overdue ? 'overdue-row' : ''}">
+                <td>
+                    ${t.title}
+                    ${t.overdue ? '<br><span class="overdue-label">⚠ OVERDUE</span>' : ''}
+                </td>
+                <td>${t.projectName}</td>
+                <td>
+                    <select class="status-select" onchange="quickUpdateStatus(${t.id}, this.value)">
+                        <option value="TODO" ${t.status==='TODO'?'selected':''}>To Do</option>
+                        <option value="IN_PROGRESS" ${t.status==='IN_PROGRESS'?'selected':''}>In Progress</option>
+                        <option value="DONE" ${t.status==='DONE'?'selected':''}>Done</option>
+                    </select>
+                </td>
+                <td><span class="badge badge-${t.priority}">${t.priority}</span></td>
+                <td>${t.assignedToName || '<span style="color:#aaa">Unassigned</span>'}</td>
+                <td style="${t.overdue?'color:#e74c3c;font-weight:600':''}">${t.dueDate || '-'}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-sm" onclick="openEditModal(${t.id})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">Del</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function quickUpdateStatus(taskId, status) {
+        await apiFetch(`/api/tasks/${taskId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+        await loadAll();
+    }
+
+    async function openCreateModal() {
+        editingTaskId = null;
+        document.getElementById('taskModalTitle').textContent = 'Create Task';
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDesc').value = '';
+        document.getElementById('taskStatus').value = 'TODO';
+        document.getElementById('taskPriority').value = 'MEDIUM';
+        document.getElementById('taskDueDate').value = '';
+
+        // Populate project dropdown
+        const pSel = document.getElementById('taskProject');
+        pSel.innerHTML = allProjects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        if (projectIdFilter) pSel.value = projectIdFilter;
+
+        await loadProjectMembers();
+        document.getElementById('taskModal').classList.add('open');
+    }
+
+    async function openEditModal(taskId) {
+        const task = allTasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        editingTaskId = taskId;
+        document.getElementById('taskModalTitle').textContent = 'Edit Task';
+        document.getElementById('taskTitle').value = task.title;
+        document.getElementById('taskDesc').value = task.description || '';
+        document.getElementById('taskStatus').value = task.status;
+        document.getElementById('taskPriority').value = task.priority;
+        document.getElementById('taskDueDate').value = task.dueDate || '';
+
+        const pSel = document.getElementById('taskProject');
+        pSel.innerHTML = allProjects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        pSel.value = task.projectId;
+
+        await loadProjectMembers();
+        if (task.assignedToId) document.getElementById('taskAssignee').value = task.assignedToId;
+
+        document.getElementById('taskModal').classList.add('open');
+    }
+
+    async function loadProjectMembers() {
+        const projectId = document.getElementById('taskProject').value;
+        if (!projectId) return;
+
+        const project = await apiFetch(`/api/projects/${projectId}`);
+        const assigneeSel = document.getElementById('taskAssignee');
+        assigneeSel.innerHTML = '<option value="">Unassigned</option>' +
+            (project?.members || []).map(m => `<option value="${m.userId}">${m.name}</option>`).join('');
+
+        // Also add project creator
+        const allUsers = await apiFetch('/api/projects/users/all') || [];
+        const currentOptions = [...assigneeSel.options].map(o => o.value);
+        allUsers.forEach(u => {
+            if (!currentOptions.includes(String(u.id))) {
+                assigneeSel.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+            }
+        });
+    }
+
+    function closeTaskModal() {
+        document.getElementById('taskModal').classList.remove('open');
+    }
+
+    async function saveTask() {
+        const title = document.getElementById('taskTitle').value.trim();
+        const description = document.getElementById('taskDesc').value.trim();
+        const projectId = document.getElementById('taskProject').value;
+        const status = document.getElementById('taskStatus').value;
+        const priority = document.getElementById('taskPriority').value;
+        const dueDate = document.getElementById('taskDueDate').value;
+        const assignedToUserId = document.getElementById('taskAssignee').value || null;
+
+        if (!title) return alert('Task title is required');
+        if (!projectId) return alert('Project is required');
+
+        const body = { title, description, projectId: parseInt(projectId), status, priority,
+            dueDate: dueDate || null,
+            assignedToUserId: assignedToUserId ? parseInt(assignedToUserId) : null };
+
+        const url = editingTaskId ? `/api/tasks/${editingTaskId}` : '/api/tasks';
+        const method = editingTaskId ? 'PUT' : 'POST';
+
+        const result = await apiFetch(url, { method, body: JSON.stringify(body) });
+        if (result && result.id) {
+            closeTaskModal();
+            await loadAll();
+        } else {
+            alert(result?.error || 'Failed to save task');
+        }
+    }
+
+    async function deleteTask(id) {
+        if (!confirm('Delete this task?')) return;
+        await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+        await loadAll();
+    }
+
+    function logout() { localStorage.clear(); window.location.href = '/index.html'; }
+
+    loadAll();
+</script>
+</body>
+</html>
