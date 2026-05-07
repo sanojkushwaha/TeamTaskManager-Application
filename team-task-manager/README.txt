@@ -1,10 +1,17 @@
 ========================================================
  TEAM TASK MANAGER - Full Stack Web Application
  Built with: Java 17 + Spring Boot 3.2 + MySQL + JWT
+ 
+ A modern full-stack task management application designed to help teams manage projects, assign tasks, and track progress efficiently.
+ Built with simplicity in mind, the platform allows admins to organize projects and manage
+ team members, while users can focus on completing assigned tasks
+ and monitoring project progress in real time.
+ The application features secure JWT authentication, role-based access control,
+ project management, task tracking, dashboard analytics, and a responsive user interface.
 ========================================================
 
-LIVE URL: https://your-app.railway.app   (update after deployment)
-GITHUB:   https://github.com/yourusername/team-task-manager
+LIVE URL: https://teamtaskmanager-application-production.up.railway.app
+GITHUB: https://github.com/sanojkushwaha/TeamTaskManager-Application
 
 ------------------------------------------------------------
 PROJECT OVERVIEW
@@ -25,40 +32,77 @@ TECH STACK
   Database : MySQL 8 + Spring Data JPA (Hibernate)
   Frontend : HTML5 + Vanilla JavaScript + CSS3
   Build    : Maven
-
+  Hosting  : Railway
 ------------------------------------------------------------
 PROJECT STRUCTURE
 ------------------------------------------------------------
-src/main/java/com/taskmanager/
-  ├── TeamTaskManagerApplication.java   (Entry point)
-  ├── config/
-  │   ├── SecurityConfig.java           (JWT + CORS + Auth)
-  │   └── GlobalExceptionHandler.java   (Error handling)
-  ├── security/
-  │   ├── JwtUtil.java                  (Token generate/validate)
-  │   ├── JwtAuthenticationFilter.java  (Request interceptor)
-  │   └── UserDetailsServiceImpl.java   (Load user from DB)
-  ├── enums/
-  │   ├── Role.java          (ADMIN, MEMBER)
-  │   ├── TaskStatus.java    (TODO, IN_PROGRESS, DONE)
-  │   └── Priority.java      (LOW, MEDIUM, HIGH)
-  ├── model/
-  │   ├── User.java          (Users table + UserDetails)
-  │   ├── Project.java       (Projects table)
-  │   ├── Task.java          (Tasks table)
-  │   └── ProjectMember.java (Project members join table)
-  ├── repository/            (Spring Data JPA repos)
-  ├── dto/                   (Request/Response objects)
-  ├── service/               (Business logic)
-  └── controller/            (REST API endpoints)
-
-src/main/resources/
-  ├── application.properties
-  └── static/
-      ├── index.html         (Login / Signup)
-      ├── dashboard.html     (Stats + Overdue + Progress)
-      ├── projects.html      (Project CRUD + Members)
-      └── tasks.html         (Task CRUD + Quick Status)
+team-task-manager/
+│
+├── src/main/java/com/taskmanager/
+│   │
+│   ├── TeamTaskManagerApplication.java
+│   │
+│   ├── config/
+│   │   ├── SecurityConfig.java
+│   │   └── GlobalExceptionHandler.java
+│   │
+│   ├── security/
+│   │   ├── JwtUtil.java
+│   │   ├── JwtAuthenticationFilter.java
+│   │   └── UserDetailsServiceImpl.java
+│   │
+│   ├── enums/
+│   │   ├── Role.java            (ADMIN, MEMBER)
+│   │   ├── TaskStatus.java      (TODO, IN_PROGRESS, DONE)
+│   │   └── Priority.java        (LOW, MEDIUM, HIGH)
+│   │
+│   ├── model/
+│   │   ├── User.java
+│   │   ├── Project.java
+│   │   ├── Task.java
+│   │   └── ProjectMember.java
+│   │
+│   ├── dto/
+│   │   ├── SignupRequest.java
+│   │   ├── LoginRequest.java
+│   │   ├── AuthResponse.java
+│   │   ├── ProjectRequest.java
+│   │   ├── ProjectResponse.java
+│   │   ├── TaskRequest.java
+│   │   ├── TaskResponse.java
+│   │   └── DashboardStats.java
+│   │
+│   ├── repository/
+│   │   ├── UserRepository.java
+│   │   ├── ProjectRepository.java
+│   │   ├── TaskRepository.java
+│   │   └── ProjectMemberRepository.java
+│   │
+│   ├── service/
+│   │   ├── AuthService.java
+│   │   ├── ProjectService.java
+│   │   ├── TaskService.java
+│   │   └── DashboardService.java
+│   │
+│   └── controller/
+│       ├── AuthController.java
+│       ├── ProjectController.java
+│       ├── TaskController.java
+│       └── DashboardController.java
+│
+├── src/main/resources/
+│   ├── application.properties           (local config)
+│   ├── application-prod.properties      (Railway config)
+│   └── static/
+│       ├── index.html                   (login & signup)
+│       ├── dashboard.html               (stats & overview)
+│       ├── projects.html                (project management)
+│       └── tasks.html                   (task management)
+│
+├── nixpacks.toml
+├── railway.json
+├── Procfile
+└── pom.xml
 
 ------------------------------------------------------------
 REST API ENDPOINTS
@@ -104,7 +148,7 @@ PREREQUISITES:
 STEPS:
 
 1. Clone or extract the project:
-   git clone https://github.com/yourusername/team-task-manager
+   git clone https://github.com/sanojkushwaha/TeamTaskManager-Application
    cd team-task-manager
 
 2. Create MySQL database:
@@ -139,9 +183,9 @@ DEPLOYMENT ON RAILWAY
    Copy the DATABASE_URL
 
 4. Set Environment Variables in Railway:
-   SPRING_DATASOURCE_URL=jdbc:mysql://...
+   SPRING_DATASOURCE_URL=
    SPRING_DATASOURCE_USERNAME=root
-   SPRING_DATASOURCE_PASSWORD=your_password
+   SPRING_DATASOURCE_PASSWORD=Kushwaha@123
    APP_JWT_SECRET=TaskManagerSuperSecretKey2024
 
 5. Railway auto-detects Maven and deploys.
@@ -206,9 +250,11 @@ SAMPLE API USAGE (Postman)
    { "status": "IN_PROGRESS" }
 
 ------------------------------------------------------------
-AUTHOR
-------------------------------------------------------------
-Name  : [Your Name]
-Email : [Your Email]
-Date  : 2024
+👨‍💻 AUTHOR
+Sanoj Kushwaha
+    Email: kushawahasanoj123@gmail.com
+    GitHub: https://github.com/sanojkushwaha/TeamTaskManager-Application
+    Project: Team Task Manager
 ========================================================
+📄 License
+This project was developed for learning and assessment purposes.
