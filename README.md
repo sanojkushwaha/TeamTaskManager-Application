@@ -1,41 +1,65 @@
-========================================================
- TEAM TASK MANAGER - Full Stack Web Application
- Built with: Java 17 + Spring Boot 3.2 + MySQL + JWT
- 
- A modern full-stack task management application designed to help teams manage projects, assign tasks, and track progress efficiently.
- Built with simplicity in mind, the platform allows admins to organize projects and manage
- team members, while users can focus on completing assigned tasks
- and monitoring project progress in real time.
- The application features secure JWT authentication, role-based access control,
- project management, task tracking, dashboard analytics, and a responsive user interface.
-========================================================
+# 🚀 Team Task Manager
 
-LIVE URL: https://teamtaskmanager-application-production.up.railway.app
-GITHUB: https://github.com/sanojkushwaha/TeamTaskManager-Application
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-brightgreen?style=for-the-badge&logo=springboot)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql)
+![JWT](https://img.shields.io/badge/JWT-Auth-purple?style=for-the-badge&logo=jsonwebtokens)
+![Railway](https://img.shields.io/badge/Deployed-Railway-black?style=for-the-badge&logo=railway)
 
-------------------------------------------------------------
-PROJECT OVERVIEW
-------------------------------------------------------------
+---
+
+# TEAM TASK MANAGER - Full Stack Web Application
+
+### Built with:
+`Java 17 + Spring Boot 3.2 + MySQL + JWT`
+
+A modern full-stack task management application designed to help teams manage projects, assign tasks, and track progress efficiently.
+
+Built with simplicity in mind, the platform allows admins to organize projects and manage team members, while users can focus on completing assigned tasks and monitoring project progress in real time.
+
+The application features secure JWT authentication, role-based access control, project management, task tracking, dashboard analytics, and a responsive user interface.
+
+---
+
+# 🌐 Live URL
+
+### 🔗 Live Application
+https://teamtaskmanager-application-production.up.railway.app
+
+### 🔗 GitHub Repository
+https://github.com/sanojkushwaha/TeamTaskManager-Application
+
+---
+
+# 📌 Project Overview
+
 A full-stack Team Task Manager with:
-  - JWT Authentication (Signup/Login)
-  - Role-Based Access Control (ADMIN / MEMBER)
-  - Project & Team Management
-  - Task Creation, Assignment & Status Tracking
-  - Dashboard with Stats, Progress & Overdue Tasks
-  - Simple HTML/JS Frontend + REST API
 
-------------------------------------------------------------
-TECH STACK
-------------------------------------------------------------
-  Backend  : Java 17, Spring Boot 3.2.3
-  Security : Spring Security + JWT (jjwt 0.11.5)
-  Database : MySQL 8 + Spring Data JPA (Hibernate)
-  Frontend : HTML5 + Vanilla JavaScript + CSS3
-  Build    : Maven
-  Hosting  : Railway
-------------------------------------------------------------
-PROJECT STRUCTURE
-------------------------------------------------------------
+- JWT Authentication (Signup/Login)
+- Role-Based Access Control (ADMIN / MEMBER)
+- Project & Team Management
+- Task Creation, Assignment & Status Tracking
+- Dashboard with Stats, Progress & Overdue Tasks
+- Simple HTML/JS Frontend + REST API
+
+---
+
+# 🛠 Tech Stack
+
+| Category | Technology |
+|---|---|
+| Backend | Java 17, Spring Boot 3.2.3 |
+| Security | Spring Security + JWT (jjwt 0.11.5) |
+| Database | MySQL 8 + Spring Data JPA (Hibernate) |
+| Frontend | HTML5 + Vanilla JavaScript + CSS3 |
+| Build | Maven |
+| Hosting | Railway |
+
+---
+
+# 📂 Project Structure
+
+```bash
 team-task-manager/
 │
 ├── src/main/java/com/taskmanager/
@@ -52,9 +76,9 @@ team-task-manager/
 │   │   └── UserDetailsServiceImpl.java
 │   │
 │   ├── enums/
-│   │   ├── Role.java            (ADMIN, MEMBER)
-│   │   ├── TaskStatus.java      (TODO, IN_PROGRESS, DONE)
-│   │   └── Priority.java        (LOW, MEDIUM, HIGH)
+│   │   ├── Role.java
+│   │   ├── TaskStatus.java
+│   │   └── Priority.java
 │   │
 │   ├── model/
 │   │   ├── User.java
@@ -91,170 +115,189 @@ team-task-manager/
 │       └── DashboardController.java
 │
 ├── src/main/resources/
-│   ├── application.properties           (local config)
-│   ├── application-prod.properties      (Railway config)
+│   ├── application.properties
+│   ├── application-prod.properties
 │   └── static/
-│       ├── index.html                   (login & signup)
-│       ├── dashboard.html               (stats & overview)
-│       ├── projects.html                (project management)
-│       └── tasks.html                   (task management)
+│       ├── index.html
+│       ├── dashboard.html
+│       ├── projects.html
+│       └── tasks.html
 │
 ├── nixpacks.toml
 ├── railway.json
 ├── Procfile
 └── pom.xml
+```
 
-------------------------------------------------------------
-REST API ENDPOINTS
-------------------------------------------------------------
+---
 
-AUTH:
-  POST   /api/auth/signup         Register (ADMIN/MEMBER)
-  POST   /api/auth/login          Login, returns JWT
+# 🌐 REST API Endpoints
 
-PROJECTS (Authenticated):
-  GET    /api/projects            List my projects
-  POST   /api/projects            Create project [ADMIN]
-  GET    /api/projects/{id}       Get project details
-  PUT    /api/projects/{id}       Update project [ADMIN]
-  DELETE /api/projects/{id}       Delete project [ADMIN]
-  POST   /api/projects/{id}/members/{userId}   Add member [ADMIN]
-  DELETE /api/projects/{id}/members/{userId}   Remove member [ADMIN]
-  GET    /api/projects/users/all  List all users
+## 🔐 AUTH APIs
 
-TASKS (Authenticated):
-  POST   /api/tasks               Create task
-  GET    /api/tasks/project/{id}  Tasks by project
-  GET    /api/tasks/my            My assigned tasks
-  GET    /api/tasks/all           All tasks [ADMIN]
-  GET    /api/tasks/{id}          Get task
-  PUT    /api/tasks/{id}          Update task
-  PATCH  /api/tasks/{id}/status   Quick status update
-  DELETE /api/tasks/{id}          Delete task
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/signup` | Register User |
+| POST | `/api/auth/login` | Login & Get JWT |
 
-DASHBOARD:
-  GET    /api/dashboard           Stats, overdue, progress
+---
 
-------------------------------------------------------------
-SETUP & RUN LOCALLY
-------------------------------------------------------------
+## 📁 PROJECT APIs
 
-PREREQUISITES:
-  - Java 17+
-  - Maven 3.8+
-  - MySQL 8 running on localhost:3306
-  - IntelliJ IDEA (recommended)
+| Method | Endpoint |
+|---|---|
+| GET | `/api/projects` |
+| POST | `/api/projects` |
+| GET | `/api/projects/{id}` |
+| PUT | `/api/projects/{id}` |
+| DELETE | `/api/projects/{id}` |
 
-STEPS:
+---
 
-1. Clone or extract the project:
-   git clone https://github.com/sanojkushwaha/TeamTaskManager-Application
-   cd team-task-manager
+## ✅ TASK APIs
 
-2. Create MySQL database:
-   mysql -u root -p
-   CREATE DATABASE task_manager_db;
-   EXIT;
+| Method | Endpoint |
+|---|---|
+| POST | `/api/tasks` |
+| GET | `/api/tasks/project/{id}` |
+| GET | `/api/tasks/my` |
+| PUT | `/api/tasks/{id}` |
+| PATCH | `/api/tasks/{id}/status` |
+| DELETE | `/api/tasks/{id}` |
 
-3. Update DB credentials in:
-   src/main/resources/application.properties
-   → Set spring.datasource.username and spring.datasource.password
+---
 
-4. Run the application:
-   mvn spring-boot:run
-   OR open in IntelliJ → Run TeamTaskManagerApplication
+# ⚙️ Setup & Run Locally
 
-5. Access the app:
-   Frontend:  http://localhost:8080/
-   API Base:  http://localhost:8080/api
+## 1️⃣ Clone Repository
 
-NOTE: Tables are auto-created by Hibernate on first run.
+```bash
+git clone https://github.com/sanojkushwaha/TeamTaskManager-Application
+cd team-task-manager
+```
 
-------------------------------------------------------------
-DEPLOYMENT ON RAILWAY
-------------------------------------------------------------
+---
+
+## 2️⃣ Create Database
+
+```sql
+CREATE DATABASE task_manager_db;
+```
+
+---
+
+## 3️⃣ Configure Database
+
+Update:
+
+```properties
+src/main/resources/application.properties
+```
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/task_manager_db
+spring.datasource.username=root
+spring.datasource.password=YOUR_PASSWORD
+```
+
+---
+
+## 4️⃣ Run Application
+
+```bash
+mvn spring-boot:run
+```
+
+Application runs at:
+
+```bash
+http://localhost:8080
+```
+
+---
+
+# 🚀 Deployment on Railway
 
 1. Push code to GitHub
 
-2. Go to https://railway.app → New Project → Deploy from GitHub
+2. Go to Railway Dashboard
 
-3. Add MySQL Plugin:
-   Dashboard → + New → Database → MySQL
-   Copy the DATABASE_URL
+3. Create New Project
 
-4. Set Environment Variables in Railway:
-   SPRING_DATASOURCE_URL=
-   SPRING_DATASOURCE_USERNAME=root
-   SPRING_DATASOURCE_PASSWORD=Kushwaha@123
-   APP_JWT_SECRET=TaskManagerSuperSecretKey2024
+4. Deploy from GitHub Repository
 
-5. Railway auto-detects Maven and deploys.
-   Get the public URL from Railway dashboard.
+5. Add MySQL Plugin
 
-------------------------------------------------------------
-ROLE-BASED ACCESS CONTROL
-------------------------------------------------------------
+6. Configure Environment Variables
 
-ADMIN can:
-  ✅ Create / Edit / Delete projects
-  ✅ Add / Remove members from projects
-  ✅ Create / Edit / Delete any task
-  ✅ View all projects, tasks, and users
-  ✅ See full dashboard stats
+7. Deploy Application
 
-MEMBER can:
-  ✅ View projects they are added to
-  ✅ Create tasks in their projects
-  ✅ Update tasks assigned to them
-  ✅ Update task status
-  ✅ View their own dashboard stats
+---
 
-------------------------------------------------------------
-SAMPLE API USAGE (Postman)
-------------------------------------------------------------
+# 🔒 Role-Based Access Control
 
-1. Signup as Admin:
-   POST /api/auth/signup
-   {
-     "name": "John Admin",
-     "email": "admin@test.com",
-     "password": "admin123",
-     "role": "ADMIN"
-   }
+## ADMIN
+- Create / Edit / Delete projects
+- Add / Remove members
+- Create / Edit / Delete tasks
+- View all projects and tasks
+- Access full dashboard
 
-2. Login:
-   POST /api/auth/login
-   { "email": "admin@test.com", "password": "admin123" }
-   → Copy the "token" from response
+## MEMBER
+- View assigned projects
+- Create tasks
+- Update assigned tasks
+- Update task status
+- View personal dashboard stats
 
-3. Use token in all requests:
-   Header: Authorization: Bearer <your_token>
+---
 
-4. Create Project:
-   POST /api/projects
-   { "name": "My Project", "description": "Test project" }
+# 📬 Sample API Usage
 
-5. Create Task:
-   POST /api/tasks
-   {
-     "title": "Fix login bug",
-     "description": "User reports login fails",
-     "projectId": 1,
-     "priority": "HIGH",
-     "dueDate": "2024-12-31",
-     "assignedToUserId": 2
-   }
+## Signup
 
-6. Update Task Status:
-   PATCH /api/tasks/1/status
-   { "status": "IN_PROGRESS" }
+```http
+POST /api/auth/signup
+```
 
-------------------------------------------------------------
-👨‍💻 AUTHOR
-Sanoj Kushwaha
-    Email: kushawahasanoj123@gmail.com
-    GitHub: https://github.com/sanojkushwaha/TeamTaskManager-Application
-    Project: Team Task Manager
-========================================================
-📄 License
+```json
+{
+  "name": "John Admin",
+  "email": "admin@test.com",
+  "password": "admin123",
+  "role": "ADMIN"
+}
+```
+
+---
+
+## Login
+
+```http
+POST /api/auth/login
+```
+
+```json
+{
+  "email": "admin@test.com",
+  "password": "admin123"
+}
+```
+
+---
+
+# 👨‍💻 Author
+
+## Sanoj Kushwaha
+
+📧 Email:  
+kushawahasanoj123@gmail.com
+
+🔗 GitHub:  
+https://github.com/sanojkushwaha/TeamTaskManager-Application
+
+---
+
+# 📄 License
+
 This project was developed for learning and assessment purposes.
